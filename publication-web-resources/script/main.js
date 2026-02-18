@@ -194,16 +194,31 @@ window.addEventListener("load", function () {
 	applyInitialPageFromQuery();
 	updateCoverState();
 });
-function applyInitialPageFromQuery() {
-	var params = new URLSearchParams(window.location.search);
-	var pageParam = params.get("page");
-	if (!pageParam && document.referrer) {
-		try {
-			var referrerUrl = new URL(document.referrer);
-			pageParam = referrerUrl.searchParams.get("page");
-		} catch (error) {
-			pageParam = null;
+function readPageParamFromUrl(urlString) {
+	if (!urlString) {
+		return null;
+	}
+	try {
+		var url = new URL(urlString);
+		var param = url.searchParams.get("page");
+		if (param) {
+			return param;
 		}
+		if (url.hash) {
+			var hash = url.hash.replace(/^#/, "");
+			if (hash.indexOf("page=") === 0) {
+				return hash.replace("page=", "");
+			}
+		}
+	} catch (error) {
+		return null;
+	}
+	return null;
+}
+function applyInitialPageFromQuery() {
+	var pageParam = readPageParamFromUrl(window.location.href);
+	if (!pageParam && document.referrer) {
+		pageParam = readPageParamFromUrl(document.referrer);
 	}
 	if (!pageParam) {
 		return;
@@ -223,9 +238,9 @@ function applyInitialPageFromQuery() {
 function getCurrentPageLink() {
 	var pageNumber = currentPage * 2;
 	if (!shareBaseUrl) {
-		return window.location.origin + window.location.pathname + "?page=" + pageNumber;
+		return window.location.origin + window.location.pathname + "#page=" + pageNumber;
 	}
-	return shareBaseUrl + "?page=" + pageNumber;
+	return shareBaseUrl + "#page=" + pageNumber;
 }
 async function copyPageLink() {
 	var link = getCurrentPageLink();
