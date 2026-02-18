@@ -7,6 +7,7 @@
 	--glow: rgba(0, 0, 0, 0.18);
 	--shadow: rgba(18, 18, 18, 0.18);
 	--shell: rgba(255, 255, 255, 0.6);
+	--toc-width: min(320px, 78vw);
 }
 html, body {
 	margin: 0;
@@ -27,45 +28,43 @@ body {
 	padding: clamp(12px, 2vw, 28px);
 	box-sizing: border-box;
 }
-.toc-panel::after {
-	content: "<";
-	position: absolute;
-	right: 8px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 14px;
-	font-weight: 600;
-	color: rgba(0, 0, 0, 0.7);
-	pointer-events: none;
-	z-index: 6;
-}
-body.toc-open .toc-panel::after {
-	content: ">";
-}
 .toc-toggle-hit {
 	position: absolute;
-	right: -10px;
+	left: clamp(10px, 2vw, 24px);
 	top: 50%;
-	transform: translateY(-50%);
+	transform: translate(-100%, -50%);
 	width: 24px;
 	height: 72px;
 	background: transparent;
 	cursor: pointer;
 	z-index: 6;
 }
+body.toc-open .toc-toggle-hit {
+	left: calc(clamp(10px, 2vw, 24px) + var(--toc-width));
+}
+.toc-toggle-hit::after {
+	content: "<";
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 14px;
+	font-weight: 600;
+	color: rgba(0, 0, 0, 0.7);
+	pointer-events: none;
+}
+body.toc-open .toc-toggle-hit::after {
+	content: ">";
+}
 .toc-toggle-hit:focus-visible {
 	outline: none;
-}
-.toc-tab:focus-visible {
-	outline: 2px solid rgba(0, 0, 0, 0.8);
-	outline-offset: 2px;
 }
 .toc-panel {
 	position: absolute;
 	left: clamp(10px, 2vw, 24px);
 	top: 50%;
 	transform: translate(calc(-100% + 0px), -50%);
-	width: min(320px, 78vw);
+	width: var(--toc-width);
 	height: min(72vh, 640px);
 	background: rgba(255, 255, 255, 0.7);
 	border: 1px solid rgba(0, 0, 0, 0.18);
