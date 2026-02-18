@@ -5,6 +5,7 @@ const shareBaseUrl = "https://www.freedomseries.ai/riseofsibook";
 const searchIndexUrl = "publication-web-resources/search/index.json";
 var searchIndex = null;
 var searchLoading = null;
+const lastPageStorageKey = "riseofsi-last-page";
 function pageNumberToFileIndex(pageNumber) {
 	return Math.floor(pageNumber / 2);
 }
@@ -362,9 +363,34 @@ function applyInitialPageFromQuery() {
 		pageParam = readPageParamFromUrl(document.referrer);
 	}
 	if (!pageParam) {
+		var storedPage = getStoredPageNumber();
+		if (storedPage !== null) {
+			applyPageNumber(storedPage, false);
+		}
 		return;
 	}
 	applyPageNumber(pageParam, true);
+}
+function getStoredPageNumber() {
+	try {
+		var value = window.localStorage.getItem(lastPageStorageKey);
+		if (!value) {
+			return null;
+		}
+		var pageNumber = Number(value);
+		if (Number.isNaN(pageNumber)) {
+			return null;
+		}
+		return pageNumber;
+	} catch (error) {
+		return null;
+	}
+}
+function storePageNumber(pageNumber) {
+	try {
+		window.localStorage.setItem(lastPageStorageKey, String(pageNumber));
+	} catch (error) {
+	}
 }
 function applyPageNumber(rawPage, showStatus) {
 	var pageNumber = Number(rawPage);
@@ -373,6 +399,7 @@ function applyPageNumber(rawPage, showStatus) {
 		return;
 	}
 	pageNumber = Math.max(0, Math.min(maxPageNumber, Math.floor(pageNumber)));
+	storePageNumber(pageNumber);
 	currentPage = pageNumberToFileIndex(pageNumber);
 	changePublication();
 	showHideArrows();
@@ -479,6 +506,7 @@ function changePublication() {
 		else
 			currentPageUrl = currentPageUrl + "publication" + ".html";
 		document.getElementById("contentIFrame").src = currentPageUrl;
+		storePageNumber(currentPage * 2);
 		updateCoverState();
 		if ((currentPage + 1) < totalHtmlFiles) {
 			nextPageUrl = nextPageUrl + "publication-" + (currentPage + 1) + ".html";
