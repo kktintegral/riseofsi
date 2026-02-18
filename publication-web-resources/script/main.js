@@ -1,5 +1,5 @@
 var currentPage = 0;
-const totalHtmlFiles = 153;
+const totalHtmlFiles = 152;
 const pageSize = { width: 1008, height: 720 };
 const shareBaseUrl = "https://www.freedomseries.ai/riseofsibook";
 function pageNumberToFileIndex(pageNumber) {
@@ -313,10 +313,14 @@ function jumpToPageNumber() {
 		return;
 	}
 	pageNumber = Math.floor(pageNumber);
-	if (pageNumber < 0 || pageNumber > maxPageNumber) {
+	if (pageNumber < 0) {
 		setPageStatus("Page out of range (0-" + maxPageNumber + ").");
 		return;
 	}
+	if (pageNumber > maxPageNumber) {
+		pageNumber = maxPageNumber;
+	}
+	input.value = pageNumber;
 	currentPage = pageNumberToFileIndex(pageNumber);
 	changePublication();
 	showHideArrows();
