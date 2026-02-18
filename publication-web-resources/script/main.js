@@ -124,6 +124,8 @@ window.addEventListener("load", function () {
 	var pageInput = document.getElementById("pageInput");
 	var copyLinkButton = document.getElementById("copyLinkButton");
 	var searchInput = document.getElementById("searchInput");
+	var toggleSearchButton = document.getElementById("toggleSearchButton");
+	var searchCloseButton = document.getElementById("searchCloseButton");
 	if (prevZone) {
 		prevZone.addEventListener("click", showPreviousPage);
 	}
@@ -151,6 +153,29 @@ window.addEventListener("load", function () {
 		searchInput.addEventListener("keydown", function (event) {
 			if (event.key === "Enter") {
 				runSearch();
+			}
+		});
+	}
+	if (toggleSearchButton) {
+		toggleSearchButton.addEventListener("click", function () {
+			var isOpen = document.body.classList.contains("search-open");
+			if (isOpen) {
+				document.body.classList.remove("search-open");
+				toggleSearchButton.classList.remove("active");
+			} else {
+				document.body.classList.add("search-open");
+				toggleSearchButton.classList.add("active");
+				if (searchInput) {
+					searchInput.focus();
+				}
+			}
+		});
+	}
+	if (searchCloseButton) {
+		searchCloseButton.addEventListener("click", function () {
+			document.body.classList.remove("search-open");
+			if (toggleSearchButton) {
+				toggleSearchButton.classList.remove("active");
 			}
 		});
 	}
@@ -229,6 +254,11 @@ function renderSearchResults(results) {
 		});
 		resultsWrap.appendChild(item);
 	});
+	if (results.length > 0) {
+		document.body.classList.add("search-has-results");
+	} else {
+		document.body.classList.remove("search-has-results");
+	}
 }
 async function loadSearchIndex() {
 	if (searchIndex) {
@@ -260,12 +290,14 @@ async function runSearch() {
 	if (!query) {
 		renderSearchResults([]);
 		setSearchStatus("Enter a word or phrase.");
+		document.body.classList.remove("search-has-results");
 		return;
 	}
 	setSearchStatus("Searching...");
 	var index = await loadSearchIndex();
 	if (!index) {
 		setSearchStatus("Search index unavailable.");
+		document.body.classList.remove("search-has-results");
 		return;
 	}
 	var results = [];
@@ -282,9 +314,12 @@ async function runSearch() {
 		var start = Math.max(0, matchIndex - 40);
 		var end = Math.min(raw.length, matchIndex + 60);
 		var snippet = raw.slice(start, end).replace(/\s+/g, " ").trim();
+		var pageLabel = entry.pageNumber === 0
+			? "Cover"
+			: entry.pageNumber + "-" + (entry.pageNumber + 1);
 		results.push({
 			pageNumber: entry.pageNumber,
-			pageLabel: entry.pageNumber === 0 ? "Cover" : String(entry.pageNumber),
+			pageLabel: pageLabel,
 			snippet: snippet || "Match"
 		});
 		if (results.length >= 30) {
@@ -294,6 +329,7 @@ async function runSearch() {
 	if (results.length === 0) {
 		renderSearchResults([]);
 		setSearchStatus("No matches found.");
+		document.body.classList.remove("search-has-results");
 		return;
 	}
 	renderSearchResults(results);

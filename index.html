@@ -13,24 +13,37 @@
 	</head>
 	<body onload="showHideArrows()">
 		<div class="reader-shell">
-			<aside class="toc-panel" aria-label="Table of contents">
-				<div class="toc-header">The Rise of SuperIntelligence</div>
-				<div class="toc-list" id="tocList"></div>
+			<div class="toc-stack">
+				<aside class="toc-panel" aria-label="Table of contents">
+					<div class="toc-header">The Rise of SuperIntelligence</div>
+					<div class="toc-list" id="tocList"></div>
+					<div class="toc-page-jump" role="group" aria-label="Jump to page">
+						<div class="toc-actions">
+							<button class="toc-link-button" id="copyLinkButton" type="button" aria-label="Copy link to this page">
+								<svg class="toc-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+									<path d="M9.5 14.5l5-5M7 17a4 4 0 010-6l2-2a4 4 0 016 0M17 7a4 0 010 6l-2 2a4 0 01-6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+								</svg>
+							</button>
+							<button class="toc-search-button" id="toggleSearchButton" type="button" aria-label="Open search">
+								<svg class="toc-search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+									<circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8" />
+									<path d="M16.5 16.5l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+								</svg>
+							</button>
+						</div>
+						<input class="toc-page-input" id="pageInput" type="number" inputmode="numeric" min="0" placeholder="Page #" aria-label="Page number" />
+					</div>
+				</aside>
+			</div>
+			<div class="toc-toggle-hit" role="button" tabindex="0" aria-label="Toggle table of contents"></div>
+			<aside class="search-panel" aria-label="Search">
 				<div class="toc-search" role="search" aria-label="Search the book">
+					<button class="search-close" id="searchCloseButton" type="button" aria-label="Close search">×</button>
 					<input class="toc-search-input" id="searchInput" type="search" placeholder="Search" aria-label="Search the book" />
 					<div class="toc-search-results" id="searchResults"></div>
 					<div class="toc-search-status" id="searchStatus"></div>
 				</div>
-				<div class="toc-page-jump" role="group" aria-label="Jump to page">
-					<button class="toc-link-button" id="copyLinkButton" type="button" aria-label="Copy link to this page">
-						<svg class="toc-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-							<path d="M9.5 14.5l5-5M7 17a4 4 0 010-6l2-2a4 4 0 016 0M17 7a4 4 0 010 6l-2 2a4 4 0 01-6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-					</button>
-					<input class="toc-page-input" id="pageInput" type="number" inputmode="numeric" min="0" placeholder="Page #" aria-label="Page number" />
-				</div>
 			</aside>
-			<div class="toc-toggle-hit" role="button" tabindex="0" aria-label="Toggle table of contents"></div>
 			<div class="reader-frame">
 				<iframe onload="showHideArrows();fitContentToFrame()" id="contentIFrame" class="contentIframeClass" src="publication-web-resources/html/publication.html">		</iframe>
 				<div class="page-outline" aria-hidden="true"></div>

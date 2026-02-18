@@ -29,6 +29,17 @@ body {
 	padding: clamp(12px, 2vw, 28px);
 	box-sizing: border-box;
 }
+.toc-stack {
+	position: absolute;
+	left: clamp(10px, 2vw, 24px);
+	top: 50%;
+	transform: translate(0, -50%);
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	align-items: flex-start;
+	z-index: 5;
+}
 .toc-toggle-hit {
 	position: absolute;
 	left: clamp(10px, 2vw, 24px);
@@ -61,10 +72,8 @@ body.toc-open .toc-toggle-hit::after {
 	outline: none;
 }
 .toc-panel {
-	position: absolute;
-	left: clamp(10px, 2vw, 24px);
-	top: 50%;
-	transform: translate(calc(-100% + 0px), -50%);
+	position: relative;
+	transform: translateX(-100%);
 	width: var(--toc-width);
 	height: min(72vh, 640px);
 	background: rgba(255, 255, 255, 0.7);
@@ -81,7 +90,32 @@ body.toc-open .toc-toggle-hit::after {
 	flex-direction: column;
 }
 body.toc-open .toc-panel {
-	transform: translate(0, -50%);
+	transform: translateX(0);
+}
+.search-panel {
+	position: fixed;
+	left: 50%;
+	bottom: 24px;
+	transform: translateX(-50%);
+	width: 220px;
+	max-width: calc(100vw - 32px);
+	background: rgba(255, 255, 255, 0.7);
+	border: 1px solid color-mix(in srgb, var(--accent-blue) 45%, transparent);
+	border-radius: 18px;
+	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+	backdrop-filter: blur(14px);
+	padding: 16px;
+	box-sizing: border-box;
+	display: none;
+	z-index: 6;
+}
+body.search-open .search-panel {
+	display: block;
+}
+body.search-open.search-has-results .search-panel {
+	width: min(360px, calc(100vw - 32px));
+	padding: 12px;
+	border-radius: 16px;
 }
 .toc-header {
 	font-size: 12px;
@@ -97,12 +131,31 @@ body.toc-open .toc-panel {
 	padding-right: 8px;
 }
 .toc-search {
-	margin-top: 12px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+	height: auto;
+	position: relative;
+}
+.search-close {
+	position: absolute;
+	right: 8px;
+	top: 6px;
+	border: none;
+	background: transparent;
+	width: auto;
+	height: auto;
+	line-height: 1;
+	font-size: 16px;
+	color: rgba(0, 0, 0, 0.6);
+	cursor: pointer;
+	padding: 0;
+}
+.search-close:focus-visible {
+	outline: none;
 }
 .toc-search-input {
+	width: 100%;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: 10px;
 	padding: 6px 10px;
@@ -114,12 +167,15 @@ body.toc-open .toc-panel {
 	outline: none;
 }
 .toc-search-results {
-	max-height: 140px;
+	display: none;
+	max-height: 180px;
 	overflow: auto;
 	padding-right: 6px;
-	display: flex;
 	flex-direction: column;
 	gap: 6px;
+}
+body.search-has-results .toc-search-results {
+	display: flex;
 }
 .search-result {
 	display: flex;
@@ -148,15 +204,25 @@ body.toc-open .toc-panel {
 .toc-search-status {
 	font-size: 11px;
 	color: rgba(0, 0, 0, 0.6);
-	min-height: 14px;
+	min-height: 0;
+	display: none;
+}
+body.search-has-results .toc-search-status {
+	display: block;
 }
 .toc-page-jump {
 	margin-top: auto;
 	padding: 0;
 	display: grid;
-	grid-template-columns: 1fr auto 1fr;
+	grid-template-columns: auto 1fr auto;
 	align-items: center;
 	gap: 10px;
+}
+.toc-actions {
+	grid-column: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
 }
 .toc-page-controls {
 	display: flex;
@@ -165,6 +231,7 @@ body.toc-open .toc-panel {
 }
 .toc-page-input {
 	grid-column: 2;
+	justify-self: center;
 	width: 44px;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: 10px;
@@ -189,9 +256,8 @@ body.toc-open .toc-panel {
 	color: rgba(0, 0, 0, 0.6);
 	min-height: 14px;
 }
-.toc-link-button {
-	grid-column: 1;
-	justify-self: start;
+.toc-link-button,
+.toc-search-button {
 	border: 1px solid rgba(0, 0, 0, 0.18);
 	border-radius: 999px;
 	padding: 0 8px;
@@ -206,10 +272,21 @@ body.toc-open .toc-panel {
 	align-items: center;
 	justify-content: center;
 }
-.toc-link-button:focus-visible {
+.toc-search-button.active {
+	background: color-mix(in srgb, var(--accent-blue) 20%, white);
+	border-color: color-mix(in srgb, var(--accent-blue) 55%, transparent);
+	color: var(--accent-blue);
+}
+.toc-link-button:focus-visible,
+.toc-search-button:focus-visible {
 	outline: none;
 }
 .toc-link-icon {
+	width: 14px;
+	height: 14px;
+	display: block;
+}
+.toc-search-icon {
 	width: 14px;
 	height: 14px;
 	display: block;
