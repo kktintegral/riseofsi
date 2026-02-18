@@ -14,7 +14,6 @@
 	<body onload="showHideArrows()">
 		<div class="reader-shell">
 			<aside class="toc-panel" aria-label="Table of contents">
-				<button class="toc-tab" type="button" aria-label="Toggle table of contents"></button>
 				<div class="toc-header">The Rise of SuperIntelligence</div>
 				<div class="toc-list" id="tocList"></div>
 				<div class="toc-page-jump" role="group" aria-label="Jump to page">
@@ -24,6 +23,7 @@
 					<div class="toc-page-status" id="pageStatus"></div>
 				</div>
 			</aside>
+			<div class="toc-toggle-hit" role="button" tabindex="0" aria-label="Toggle table of contents"></div>
 			<div class="reader-frame">
 				<iframe onload="showHideArrows();fitContentToFrame()" id="contentIFrame" class="contentIframeClass" src="https://kktintegral.github.io/riseofsi/publication-web-resources/html/publication.html">		</iframe>
 				<div class="page-outline" aria-hidden="true"></div>
