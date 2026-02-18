@@ -27,34 +27,34 @@ body {
 	padding: clamp(12px, 2vw, 28px);
 	box-sizing: border-box;
 }
-.toc-tab {
+.toc-panel::after {
+	content: "<";
 	position: absolute;
-	right: -14px;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 14px;
+	font-weight: 600;
+	color: rgba(0, 0, 0, 0.7);
+	pointer-events: none;
+	z-index: 6;
+}
+body.toc-open .toc-panel::after {
+	content: ">";
+}
+.toc-toggle-hit {
+	position: absolute;
+	right: -10px;
 	top: 50%;
 	transform: translateY(-50%);
 	width: 24px;
-	height: 48px;
-	border: 1px solid rgba(0, 0, 0, 0.18);
-	border-left: none;
-	background: inherit;
-	border-radius: 0 10px 10px 0;
-	box-shadow: 2px 0 8px rgba(0, 0, 0, 0.12);
+	height: 72px;
+	background: transparent;
 	cursor: pointer;
 	z-index: 6;
 }
-.toc-tab::after {
-	content: "";
-	position: absolute;
-	left: 8px;
-	top: 50%;
-	width: 6px;
-	height: 6px;
-	border-right: 2px solid rgba(0, 0, 0, 0.7);
-	border-bottom: 2px solid rgba(0, 0, 0, 0.7);
-	transform: translateY(-50%) rotate(-45deg);
-}
-body.toc-open .toc-tab::after {
-	transform: translateY(-50%) rotate(135deg);
+.toc-toggle-hit:focus-visible {
+	outline: none;
 }
 .toc-tab:focus-visible {
 	outline: 2px solid rgba(0, 0, 0, 0.8);

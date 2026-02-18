@@ -115,7 +115,7 @@ document.addEventListener("keydown", function (event) {
 window.addEventListener("load", function () {
 	var prevZone = document.querySelector(".page-click-prev");
 	var nextZone = document.querySelector(".page-click-next");
-	var tocToggle = document.querySelector(".toc-tab");
+	var tocToggle = document.querySelector(".toc-toggle-hit");
 	var tocList = document.getElementById("tocList");
 	var pageInput = document.getElementById("pageInput");
 	if (prevZone) {
