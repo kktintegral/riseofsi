@@ -197,6 +197,14 @@ window.addEventListener("load", function () {
 function applyInitialPageFromQuery() {
 	var params = new URLSearchParams(window.location.search);
 	var pageParam = params.get("page");
+	if (!pageParam && document.referrer) {
+		try {
+			var referrerUrl = new URL(document.referrer);
+			pageParam = referrerUrl.searchParams.get("page");
+		} catch (error) {
+			pageParam = null;
+		}
+	}
 	if (!pageParam) {
 		return;
 	}
