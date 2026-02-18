@@ -223,7 +223,10 @@ function applyInitialPageFromQuery() {
 	if (!pageParam) {
 		return;
 	}
-	var pageNumber = Number(pageParam);
+	applyPageNumber(pageParam, true);
+}
+function applyPageNumber(rawPage, showStatus) {
+	var pageNumber = Number(rawPage);
 	var maxPageNumber = (totalHtmlFiles - 1) * 2;
 	if (Number.isNaN(pageNumber)) {
 		return;
@@ -233,15 +236,35 @@ function applyInitialPageFromQuery() {
 	changePublication();
 	showHideArrows();
 	fitContentToFrame();
-	setPageStatus("Showing page " + pageNumber + ".");
+	if (showStatus) {
+		setPageStatus("Showing page " + pageNumber + ".");
+	}
 }
 function getCurrentPageLink() {
 	var pageNumber = currentPage * 2;
 	if (!shareBaseUrl) {
-		return window.location.origin + window.location.pathname + "#page=" + pageNumber;
+		return window.location.origin + window.location.pathname + "?page=" + pageNumber;
 	}
-	return shareBaseUrl + "#page=" + pageNumber;
+	return shareBaseUrl + "?page=" + pageNumber;
 }
+
+window.addEventListener("message", function (event) {
+	if (!event || !event.data) {
+		return;
+	}
+	var payload = event.data;
+	if (typeof payload === "string") {
+		try {
+			payload = JSON.parse(payload);
+		} catch (error) {
+			payload = null;
+		}
+	}
+	if (!payload || payload.type !== "riseofsi-page") {
+		return;
+	}
+	applyPageNumber(payload.page, false);
+});
 async function copyPageLink() {
 	var link = getCurrentPageLink();
 	if (!link) {
