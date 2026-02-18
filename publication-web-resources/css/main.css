@@ -113,7 +113,7 @@ body.search-open .search-panel {
 	display: block;
 }
 body.search-open.search-has-results .search-panel {
-	width: min(360px, calc(100vw - 32px));
+	width: min(420px, calc(100vw - 32px));
 	padding: 12px;
 	border-radius: 16px;
 }
@@ -163,6 +163,12 @@ body.search-open.search-has-results .search-panel {
 	font-family: "Work Sans", "Helvetica Neue", Arial, sans-serif;
 	background: rgba(255, 255, 255, 0.8);
 }
+.toc-search-input::-webkit-search-cancel-button,
+.toc-search-input::-webkit-search-decoration,
+.toc-search-input::-webkit-search-results-button,
+.toc-search-input::-webkit-search-results-decoration {
+	-webkit-appearance: none;
+}
 .toc-search-input:focus-visible {
 	outline: none;
 }
@@ -196,10 +202,17 @@ body.search-has-results .toc-search-results {
 }
 .search-snippet {
 	line-height: 1.2;
+	flex: 1;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .search-page {
 	font-variant-numeric: tabular-nums;
 	color: rgba(0, 0, 0, 0.6);
+	white-space: nowrap;
+	flex-shrink: 0;
 }
 .toc-search-status {
 	font-size: 11px;
