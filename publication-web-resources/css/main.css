@@ -224,9 +224,6 @@ body.toc-open .toc-panel {
 .toc-item:hover {
 	color: #000000;
 }
-body.toc-open .page-click-zone {
-	pointer-events: none;
-}
 .reader-frame {
 	position: relative;
 	width: 100%;
