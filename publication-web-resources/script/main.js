@@ -1,4 +1,6 @@
 var currentPage = 0;
+var currentLeafPage = 0;
+var singlePageMode = false;
 const totalHtmlFiles = 152;
 const pageSize = { width: 1008, height: 720 };
 const shareBaseUrl = "https://www.freedomseries.ai/riseofsibook";
@@ -81,19 +83,29 @@ function fitContentToFrame() {
 	if (!iframe || !frame) {
 		return;
 	}
+	updateSinglePageMode();
+	if (typeof currentLeafPage !== "number") {
+		currentLeafPage = currentPage * 2;
+	}
 	var frameRect = frame.getBoundingClientRect();
-	var scale = Math.min(frameRect.width / pageSize.width, frameRect.height / pageSize.height);
-	var offsetLeft = (frameRect.width - pageSize.width * scale) / 2;
+	var viewportWidth = singlePageMode ? pageSize.width / 2 : pageSize.width;
+	var scale = Math.min(frameRect.width / viewportWidth, frameRect.height / pageSize.height);
+	var offsetLeft = (frameRect.width - viewportWidth * scale) / 2;
 	var offsetTop = (frameRect.height - pageSize.height * scale) / 2;
 	iframe.style.width = pageSize.width + "px";
 	iframe.style.height = pageSize.height + "px";
 	iframe.style.transformOrigin = "top left";
 	iframe.style.transform = "scale(" + scale + ")";
-	iframe.style.left = Math.max(0, offsetLeft) + "px";
+	if (singlePageMode) {
+		var sideIndex = currentLeafPage % 2 === 0 ? 0 : 1;
+		iframe.style.left = (offsetLeft - sideIndex * viewportWidth * scale) + "px";
+	} else {
+		iframe.style.left = Math.max(0, offsetLeft) + "px";
+	}
 	iframe.style.top = Math.max(0, offsetTop) + "px";
 	iframe.setAttribute("scrolling", "no");
 	if (outline) {
-		outline.style.width = pageSize.width + "px";
+		outline.style.width = viewportWidth + "px";
 		outline.style.height = pageSize.height + "px";
 		outline.style.left = Math.max(0, offsetLeft) + "px";
 		outline.style.top = Math.max(0, offsetTop) + "px";
@@ -102,6 +114,12 @@ function fitContentToFrame() {
 	}
 }
 window.addEventListener("resize", fitContentToFrame);
+function updateSinglePageMode() {
+	var isPortrait = window.matchMedia("(orientation: portrait)").matches;
+	var isNarrow = window.matchMedia("(max-width: 900px)").matches;
+	singlePageMode = isPortrait && isNarrow;
+	document.body.classList.toggle("single-page", singlePageMode);
+}
 function updateCoverState() {
 	if (currentPage === 0) {
 		document.body.classList.add("cover-spread");
@@ -212,10 +230,7 @@ window.addEventListener("load", function () {
 					"<span class=\"toc-title\">" + entry.title + "</span>" +
 					"<span class=\"toc-page\">" + entry.page + "</span>";
 			item.addEventListener("click", function () {
-				currentPage = pageNumberToFileIndex(entry.page);
-				changePublication();
-				showHideArrows();
-				fitContentToFrame();
+				applyPageNumber(entry.page, false);
 				document.body.classList.remove("toc-open");
 			});
 				if (entry === section.items[section.items.length - 1]) {
@@ -366,6 +381,8 @@ function applyInitialPageFromQuery() {
 		var storedPage = getStoredPageNumber();
 		if (storedPage !== null) {
 			applyPageNumber(storedPage, false);
+		} else if (singlePageMode) {
+			applyPageNumber(1, false);
 		}
 		return;
 	}
@@ -400,6 +417,7 @@ function applyPageNumber(rawPage, showStatus) {
 	}
 	pageNumber = Math.max(0, Math.min(maxPageNumber, Math.floor(pageNumber)));
 	storePageNumber(pageNumber);
+	currentLeafPage = pageNumber;
 	currentPage = pageNumberToFileIndex(pageNumber);
 	changePublication();
 	showHideArrows();
@@ -409,7 +427,7 @@ function applyPageNumber(rawPage, showStatus) {
 	}
 }
 function getCurrentPageLink() {
-	var pageNumber = currentPage * 2;
+	var pageNumber = singlePageMode ? currentLeafPage : currentPage * 2;
 	if (!shareBaseUrl) {
 		return window.location.origin + window.location.pathname + "?page=" + pageNumber;
 	}
@@ -489,6 +507,7 @@ function jumpToPageNumber() {
 		pageNumber = maxPageNumber;
 	}
 	input.value = pageNumber;
+	currentLeafPage = pageNumber;
 	currentPage = pageNumberToFileIndex(pageNumber);
 	changePublication();
 	showHideArrows();
@@ -506,7 +525,7 @@ function changePublication() {
 		else
 			currentPageUrl = currentPageUrl + "publication" + ".html";
 		document.getElementById("contentIFrame").src = currentPageUrl;
-		storePageNumber(currentPage * 2);
+		storePageNumber(singlePageMode ? currentLeafPage : currentPage * 2);
 		updateCoverState();
 		if ((currentPage + 1) < totalHtmlFiles) {
 			nextPageUrl = nextPageUrl + "publication-" + (currentPage + 1) + ".html";
@@ -514,18 +533,37 @@ function changePublication() {
 	}
 }
 function showNextPage() {
-	if (currentPage >= totalHtmlFiles - 1) {
-		return;
+	var maxPageNumber = (totalHtmlFiles - 1) * 2;
+	if (singlePageMode) {
+		if (currentLeafPage >= maxPageNumber) {
+			return;
+		}
+		currentLeafPage += 1;
+		currentPage = pageNumberToFileIndex(currentLeafPage);
+	} else {
+		if (currentPage >= totalHtmlFiles - 1) {
+			return;
+		}
+		currentPage += 1;
+		currentLeafPage = currentPage * 2;
 	}
-	++currentPage;
 	changePublication();
 	showHideArrows();
 }
 function showPreviousPage() {
-	if (currentPage <= 0) {
-		return;
+	if (singlePageMode) {
+		if (currentLeafPage <= 0) {
+			return;
+		}
+		currentLeafPage -= 1;
+		currentPage = pageNumberToFileIndex(currentLeafPage);
+	} else {
+		if (currentPage <= 0) {
+			return;
+		}
+		currentPage -= 1;
+		currentLeafPage = currentPage * 2;
 	}
-	--currentPage;
 	changePublication();
 	showHideArrows();
 }

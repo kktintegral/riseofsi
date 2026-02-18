@@ -39,6 +39,10 @@ body {
 	gap: 12px;
 	align-items: flex-start;
 	z-index: 5;
+	pointer-events: none;
+}
+body.toc-open .toc-stack {
+	pointer-events: auto;
 }
 .toc-toggle-hit {
 	position: absolute;
@@ -402,6 +406,9 @@ body.search-has-results .toc-search-status {
 	pointer-events: none;
 }
 body.cover-spread .page-outline::after {
+	display: none;
+}
+body.single-page .page-outline::after {
 	display: none;
 }
 .contentIframeClass {
