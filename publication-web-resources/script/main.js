@@ -1,6 +1,7 @@
 var currentPage = 0;
 const totalHtmlFiles = 153;
 const pageSize = { width: 1008, height: 720 };
+const shareBaseUrl = "https://www.freedomseries.ai/riseofsibook";
 function pageNumberToFileIndex(pageNumber) {
 	return Math.floor(pageNumber / 2);
 }
@@ -118,6 +119,7 @@ window.addEventListener("load", function () {
 	var tocToggle = document.querySelector(".toc-toggle-hit");
 	var tocList = document.getElementById("tocList");
 	var pageInput = document.getElementById("pageInput");
+	var copyLinkButton = document.getElementById("copyLinkButton");
 	if (prevZone) {
 		prevZone.addEventListener("click", showPreviousPage);
 	}
@@ -134,6 +136,11 @@ window.addEventListener("load", function () {
 			if (event.key === "Enter") {
 				jumpToPageNumber();
 			}
+		});
+	}
+	if (copyLinkButton) {
+		copyLinkButton.addEventListener("click", function () {
+			copyPageLink();
 		});
 	}
 	if (tocList) {
@@ -184,8 +191,63 @@ window.addEventListener("load", function () {
 			tocList.appendChild(sectionWrap);
 		});
 	}
+	applyInitialPageFromQuery();
 	updateCoverState();
 });
+function applyInitialPageFromQuery() {
+	var params = new URLSearchParams(window.location.search);
+	var pageParam = params.get("page");
+	if (!pageParam) {
+		return;
+	}
+	var pageNumber = Number(pageParam);
+	var maxPageNumber = (totalHtmlFiles - 1) * 2;
+	if (Number.isNaN(pageNumber)) {
+		return;
+	}
+	pageNumber = Math.max(0, Math.min(maxPageNumber, Math.floor(pageNumber)));
+	currentPage = pageNumberToFileIndex(pageNumber);
+	changePublication();
+	showHideArrows();
+	fitContentToFrame();
+	setPageStatus("Showing page " + pageNumber + ".");
+}
+function getCurrentPageLink() {
+	var pageNumber = currentPage * 2;
+	if (!shareBaseUrl) {
+		return window.location.origin + window.location.pathname + "?page=" + pageNumber;
+	}
+	return shareBaseUrl + "?page=" + pageNumber;
+}
+async function copyPageLink() {
+	var link = getCurrentPageLink();
+	if (!link) {
+		setPageStatus("No page link available.");
+		return;
+	}
+	try {
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			await navigator.clipboard.writeText(link);
+			setPageStatus("Link copied.");
+			return;
+		}
+	} catch (error) {
+	}
+	var temp = document.createElement("textarea");
+	temp.value = link;
+	temp.setAttribute("readonly", "");
+	temp.style.position = "absolute";
+	temp.style.left = "-9999px";
+	document.body.appendChild(temp);
+	temp.select();
+	try {
+		document.execCommand("copy");
+		setPageStatus("Link copied.");
+	} catch (error) {
+		setPageStatus("Copy failed.");
+	}
+	document.body.removeChild(temp);
+}
 function setPageStatus(message) {
 	var status = document.getElementById("pageStatus");
 	if (status) {

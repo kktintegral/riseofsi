@@ -102,6 +102,7 @@ body.toc-open .toc-panel {
 	flex-direction: column;
 	gap: 8px;
 	align-items: center;
+	padding-bottom: 18px;
 }
 .toc-page-controls {
 	display: flex;
@@ -131,6 +132,31 @@ body.toc-open .toc-panel {
 	font-size: 11px;
 	color: rgba(0, 0, 0, 0.6);
 	min-height: 14px;
+}
+.toc-link-button {
+	position: absolute;
+	right: 16px;
+	bottom: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.18);
+	border-radius: 999px;
+	padding: 4px 6px;
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	background: rgba(255, 255, 255, 0.75);
+	color: rgba(0, 0, 0, 0.7);
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+.toc-link-button:focus-visible {
+	outline: none;
+}
+.toc-link-icon {
+	width: 14px;
+	height: 14px;
+	display: block;
 }
 .toc-section {
 	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
