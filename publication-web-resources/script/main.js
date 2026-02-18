@@ -2,6 +2,9 @@ var currentPage = 0;
 const totalHtmlFiles = 152;
 const pageSize = { width: 1008, height: 720 };
 const shareBaseUrl = "https://www.freedomseries.ai/riseofsibook";
+const searchIndexUrl = "publication-web-resources/search/index.json";
+var searchIndex = null;
+var searchLoading = null;
 function pageNumberToFileIndex(pageNumber) {
 	return Math.floor(pageNumber / 2);
 }
@@ -120,6 +123,7 @@ window.addEventListener("load", function () {
 	var tocList = document.getElementById("tocList");
 	var pageInput = document.getElementById("pageInput");
 	var copyLinkButton = document.getElementById("copyLinkButton");
+	var searchInput = document.getElementById("searchInput");
 	if (prevZone) {
 		prevZone.addEventListener("click", showPreviousPage);
 	}
@@ -141,6 +145,13 @@ window.addEventListener("load", function () {
 	if (copyLinkButton) {
 		copyLinkButton.addEventListener("click", function () {
 			copyPageLink();
+		});
+	}
+	if (searchInput) {
+		searchInput.addEventListener("keydown", function (event) {
+			if (event.key === "Enter") {
+				runSearch();
+			}
 		});
 	}
 	if (tocList) {
@@ -194,6 +205,100 @@ window.addEventListener("load", function () {
 	applyInitialPageFromQuery();
 	updateCoverState();
 });
+function setSearchStatus(message) {
+	var status = document.getElementById("searchStatus");
+	if (status) {
+		status.textContent = message;
+	}
+}
+function renderSearchResults(results) {
+	var resultsWrap = document.getElementById("searchResults");
+	if (!resultsWrap) {
+		return;
+	}
+	resultsWrap.innerHTML = "";
+	results.forEach(function (result) {
+		var item = document.createElement("div");
+		item.className = "search-result";
+		item.innerHTML =
+			"<span class=\"search-snippet\">" + result.snippet + "</span>" +
+			"<span class=\"search-page\">" + result.pageLabel + "</span>";
+		item.addEventListener("click", function () {
+			applyPageNumber(result.pageNumber, false);
+			document.body.classList.remove("toc-open");
+		});
+		resultsWrap.appendChild(item);
+	});
+}
+async function loadSearchIndex() {
+	if (searchIndex) {
+		return searchIndex;
+	}
+	if (searchLoading) {
+		return searchLoading;
+	}
+	searchLoading = (async function () {
+		try {
+			var response = await fetch(searchIndexUrl, { cache: "no-store" });
+			if (!response.ok) {
+				return null;
+			}
+			return await response.json();
+		} catch (error) {
+			return null;
+		}
+	})();
+	searchIndex = await searchLoading;
+	return searchIndex;
+}
+async function runSearch() {
+	var input = document.getElementById("searchInput");
+	if (!input) {
+		return;
+	}
+	var query = input.value.trim().toLowerCase();
+	if (!query) {
+		renderSearchResults([]);
+		setSearchStatus("Enter a word or phrase.");
+		return;
+	}
+	setSearchStatus("Searching...");
+	var index = await loadSearchIndex();
+	if (!index) {
+		setSearchStatus("Search index unavailable.");
+		return;
+	}
+	var results = [];
+	for (var i = 0; i < index.length; i++) {
+		var entry = index[i];
+		if (!entry || !entry.text) {
+			continue;
+		}
+		var matchIndex = entry.text.indexOf(query);
+		if (matchIndex === -1) {
+			continue;
+		}
+		var raw = entry.rawText || entry.text;
+		var start = Math.max(0, matchIndex - 40);
+		var end = Math.min(raw.length, matchIndex + 60);
+		var snippet = raw.slice(start, end).replace(/\s+/g, " ").trim();
+		results.push({
+			pageNumber: entry.pageNumber,
+			pageLabel: entry.pageNumber === 0 ? "Cover" : String(entry.pageNumber),
+			snippet: snippet || "Match"
+		});
+		if (results.length >= 30) {
+			break;
+		}
+	}
+	if (results.length === 0) {
+		renderSearchResults([]);
+		setSearchStatus("No matches found.");
+		return;
+	}
+	renderSearchResults(results);
+	setSearchStatus("Showing " + results.length + " result(s).");
+}
 function readPageParamFromUrl(urlString) {
 	if (!urlString) {
 		return null;
