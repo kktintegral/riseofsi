@@ -224,7 +224,7 @@ body.toc-open .toc-panel {
 	color: rgba(0, 0, 0, 0.6);
 }
 .toc-item:hover {
-	color: #000000;
+	color: var(--accent-blue);
 }
 .reader-frame {
 	position: relative;
