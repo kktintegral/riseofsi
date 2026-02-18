@@ -8,6 +8,7 @@
 	--shadow: rgba(18, 18, 18, 0.18);
 	--shell: rgba(255, 255, 255, 0.6);
 	--toc-width: min(320px, 78vw);
+	--accent-blue: #3c60a8;
 }
 html, body {
 	margin: 0;
@@ -50,7 +51,7 @@ body.toc-open .toc-toggle-hit {
 	transform: translate(-50%, -50%);
 	font-size: 14px;
 	font-weight: 600;
-	color: rgba(0, 0, 0, 0.7);
+	color: var(--accent-blue);
 	pointer-events: none;
 }
 body.toc-open .toc-toggle-hit::after {
@@ -67,7 +68,7 @@ body.toc-open .toc-toggle-hit::after {
 	width: var(--toc-width);
 	height: min(72vh, 640px);
 	background: rgba(255, 255, 255, 0.7);
-	border: 1px solid rgba(0, 0, 0, 0.18);
+	border: 1px solid color-mix(in srgb, var(--accent-blue) 45%, transparent);
 	border-radius: 18px;
 	transition: transform 220ms ease, box-shadow 220ms ease;
 	box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
@@ -87,7 +88,7 @@ body.toc-open .toc-panel {
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
 	margin-bottom: 16px;
-	color: rgba(0, 0, 0, 0.8);
+	color: var(--accent-blue);
 }
 .toc-list {
 	overflow: auto;
@@ -160,7 +161,7 @@ body.toc-open .toc-panel {
 	display: block;
 }
 .toc-section {
-	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	border-bottom: 1px solid color-mix(in srgb, var(--accent-blue) 30%, transparent);
 	padding-bottom: 6px;
 	margin-bottom: 6px;
 }
@@ -207,7 +208,7 @@ body.toc-open .toc-panel {
 	align-items: baseline;
 	gap: 12px;
 	padding: 6px 0;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	border-bottom: 1px solid color-mix(in srgb, var(--accent-blue) 25%, transparent);
 	font-size: 12px;
 	color: rgba(0, 0, 0, 0.85);
 	cursor: pointer;
